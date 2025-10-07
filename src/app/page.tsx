@@ -1,11 +1,11 @@
-import TaskCard from "@/components/TaskCard";
-
+import TaskList from "@/components/TaskList";
 
 export default function Home() {
   return (
     <div>
-    <TaskCard/>
-  
+      <section>
+        <TaskList></TaskList>
+      </section>
     </div>
   );
 }

@@ -12,7 +12,7 @@ const buttonVariants = cva(
         default:
           "rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 hover:from-orange-600 hover:to-amber-600 focus-visible:ring-orange-300",
         destructive:
-          "rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 hover:from-orange-600 hover:to-amber-600 focus-visible:ring-orange-300 lg:flex hidden",
+          "rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 hover:from-orange-600 hover:to-amber-600 focus-visible:ring-orange-300 sm:flex hidden",
         outline:
           "rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0 hover:from-orange-600 hover:to-amber-600 focus-visible:ring-orange-300 ",
         secondary:

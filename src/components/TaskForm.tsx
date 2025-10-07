@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTaskStore, Task } from "@/store/taskStore";
 import { v4 as uuidv4 } from "uuid";
+import toast from "react-hot-toast";
+
 import {
   Form,
   FormField,
@@ -13,6 +15,7 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -23,7 +26,6 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import toast, { Toaster } from "react-hot-toast";
 import { useState } from "react";
 
 const schema = z.object({
@@ -39,14 +41,13 @@ interface TaskFormProps {
   onClose: () => void;
 }
 
-export default function TaskForm({ task }: TaskFormProps) {
+export default function TaskForm({ task, onClose }: TaskFormProps) {
   const isEditMode = !!task;
-
   const { addTask, updateTask } = useTaskStore();
-  const [dataAdding, setDataAdding] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(schema),
-
     defaultValues: {
       title: task?.title || "",
       description: task?.description || "",
@@ -54,29 +55,39 @@ export default function TaskForm({ task }: TaskFormProps) {
     },
   });
 
-  const onSubmit = (values: TaskFormValues) => {
-    setDataAdding(true);
-    if (isEditMode && task?.id) {
-      updateTask(task.id, values);
-    } else {
-      addTask({
-        id: uuidv4(),
-        createdAt: new Date().toISOString(),
-        ...values,
-      });
-      toast.success("Task added successfully!");
-      setDataAdding(false);
-      form.reset();
+  const onSubmit = async (values: TaskFormValues) => {
+    try {
+      setIsSubmitting(true);
+
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      if (isEditMode && task?.id) {
+        updateTask(task.id, values);
+        toast.success("Task updated successfully!");
+      } else {
+        addTask({
+          id: uuidv4(),
+          createdAt: new Date().toISOString(),
+          ...values,
+        });
+        toast.success("Task added successfully!");
+        form.reset();
+      }
+
+      onClose();
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Form {...form}>
-      <Toaster />
-
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 p-6 rounded-2xl mt-25 card shadow-xl max-w-[500px] mx-auto"
+        className="space-y-5 p-6 rounded-2xl shadow-xl bg-white dark:bg-gray-800 "
       >
         <FormField
           control={form.control}
@@ -85,7 +96,11 @@ export default function TaskForm({ task }: TaskFormProps) {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Task title" {...field} />
+                <Input
+                  placeholder="Task title"
+                  {...field}
+                  disabled={isSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -99,7 +114,11 @@ export default function TaskForm({ task }: TaskFormProps) {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Task description" {...field} />
+                <Textarea
+                  placeholder="Task description"
+                  {...field}
+                  disabled={isSubmitting}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -114,7 +133,8 @@ export default function TaskForm({ task }: TaskFormProps) {
               <FormControl>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  value={field.value}
+                  disabled={isSubmitting}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
@@ -130,8 +150,19 @@ export default function TaskForm({ task }: TaskFormProps) {
           )}
         />
 
-        <Button variant={"outline"} type="submit" className="w-full">
-          {dataAdding ? "Add Task..." : "Add Task"}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isSubmitting}
+          variant={isEditMode ? "outline" : "default"}
+        >
+          {isSubmitting
+            ? isEditMode
+              ? "Updating..."
+              : "Adding..."
+            : isEditMode
+            ? "Save Changes"
+            : "Add Task"}
         </Button>
       </form>
     </Form>
