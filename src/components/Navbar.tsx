@@ -37,7 +37,7 @@ export default function Navbar() {
               Home
             </Link>
             <Link
-              href="/addTasks"
+              href="/addTask"
               className="text-[15px] font-medium text-gray-700 dark:text-gray-200 hover:text-[#674ddb] transition-colors"
             >
               Add Tasks
@@ -84,7 +84,7 @@ export default function Navbar() {
                 Home
               </Link>
               <Link
-                href="/addTasks"
+                href="/addTask"
                 onClick={() => setMenuOpen(false)}
                 className="text-[15px] font-medium hover:text-[#674ddb] transition-colors"
               >
